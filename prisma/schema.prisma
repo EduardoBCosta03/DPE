@@ -12,3 +12,73 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+
+model Product {
+  id               Int                @id @default(autoincrement())
+  name             String             @db.VarChar(255)
+  description      String             @db.Text
+  images           String[]           @db.VarChar(255)
+  price            Float
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  categoryProducts category_product[]
+  salesTiens       sales_tiens[]
+}
+
+model Category {
+  id               Int                @id @default(autoincrement())
+  label            String             @db.VarChar(255)
+  categoryProducts category_product[]
+}
+
+model category_product {
+  id         Int      @id @default(autoincrement())
+  categoryId Int      @db.Integer
+  productId  Int      @db.Integer
+  category   Category @relation(fields: [categoryId], references: [id])
+  product    Product  @relation(fields: [productId], references: [id])
+}
+
+model inventory {
+  id                 Int      @id @default(autoincrement())
+  productId          Int      @db.Integer
+  quantity_available Int      @db.Integer
+  updatedAt          DateTime @updatedAt
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  email     String   @db.VarChar(255)
+  phone     String   @db.VarChar(255)
+  age       Int      @db.Integer
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  sales     Sale[]
+}
+
+model Sale {
+  id              Int            @id @default(autoincrement())
+  clientId        Int            @db.Integer
+  client          Client         @relation(fields: [clientId], references: [id])
+  amount          Float          @db.Real
+  paymentMethodId Int            @db.Integer
+  paymentMethod   payment_method @relation(fields: [paymentMethodId], references: [id])
+  salesTiens      sales_tiens[]
+}
+
+model payment_method {
+  id    Int    @id @default(autoincrement())
+  name  String @db.VarChar(255)
+  sales Sale[]
+}
+
+model sales_tiens {
+  id        Int      @id @default(autoincrement())
+  saleId    Int      @db.Integer
+  sale      Sale     @relation(fields: [saleId], references: [id])
+  productId Int      @db.Integer
+  product   Product  @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
